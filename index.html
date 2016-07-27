@@ -1,0 +1,31 @@
+<html>
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="./js/cookie.js" type="text/javascript"></script>
+    <script src="./js/oAuth2utils.js" type="text/javascript"></script>
+    <script src="./js/gfitRest.js" type="text/javascript"></script>
+    <script src="./js/core.js" type="text/javascript"></script>
+    
+  </head>
+
+  <body>
+    
+    GOOGLE_AUTH_CODE: <input id="inp-google-auth-code" style="width: 500px;">
+    <br/>
+    ACCESS_TOKEN: <input id="inp-access_token" style="width: 500px;"> <input type="button" value="RESET" onclick="resetAccessToken()">
+    <br/>
+    REFRESH_TOKEN: <input id="inp-refresh-token" style="width: 500px;">
+    <br/>
+    These value are stored into browser cookies. Reset these cookies <input type="button" value="Reset" onclick="resetCookies()">
+    <hr>
+    
+    <div id="not-logged">
+        You are not logged. Please <input type="button" onclick="requestGoogleAuthToken()" value="login">
+    </div>
+    
+    <div id="logged-in">
+        logged...
+    </div>
+    
+  </body>
+</html>
