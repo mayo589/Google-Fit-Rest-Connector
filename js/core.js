@@ -1,4 +1,64 @@
 $(document).ready(function () {
+    
+    $.datetimepicker.setLocale('en');
+    
+    $('#startDatePicker').datetimepicker({
+        timepicker: false,
+        format:'Y/m/d',
+    });
+    
+    $('#endDatePicker').datetimepicker({
+        timepicker: false,
+        format:'Y/m/d',
+    });
+    
+    $("#btn-request").on("click", function (){
+       //TODO validate input fields
+       var startDate = new Date($("#startDatePicker").val());
+       var endDate = new Date($("#endDatePicker").val());
+       
+       var selectedTypeVal = $("#select-datatype").val();
+       var dataTypeName = "";
+       switch(selectedTypeVal) {
+            case "calories":
+                dataTypeName = DataTypeName.CALORIES;
+                break;
+            case "activities":
+                dataTypeName = DataTypeName.ACTIVITIES;
+                break;
+            case "steps":
+                dataTypeName = DataTypeName.STEPS;
+                break;
+            case "distance":
+                dataTypeName = DataTypeName.DISTANCE;
+                break;
+            default:
+                break;
+        }
+       
+       var selectedBucketBy = $("#select-bucketby").val();
+       var bucketBy = "";
+       switch(selectedBucketBy) {
+            case "hour":
+                bucketBy = BucketTimeMillis.HOUR;
+                break;
+            case "day":
+                bucketBy =BucketTimeMillis.DAY;
+                break;
+            case "week":
+                bucketBy = BucketTimeMillis.WEEK;
+                break;
+            case "month":
+                bucketBy = BucketTimeMillis.MONTH;
+                break;
+            default:
+                break;
+        }
+        
+       var result = getAggregatedData(dataTypeName, startDate, endDate, bucketBy);
+       parseAndDisplay(result, dataTypeName);
+    });
+    
     refreshCodeInputs();
     
     if(typeof Cookies.get(COOKIE_GOOGLE_AUTH_CODE) != "undefined" && Cookies.get(COOKIE_GOOGLE_AUTH_CODE) != ""){
@@ -8,6 +68,7 @@ $(document).ready(function () {
 
         $("#not-logged").hide();
         $("#logged-in").show();
+       
     }
     else{
         $("#not-logged").show();
@@ -66,4 +127,46 @@ function resetCookies(){
 function resetAccessToken(){
     Cookies.remove(COOKIE_ACCESS_TOKEN); 
     window.location.reload();
+}
+
+function parseAndDisplay(data, dataTypeName){
+    if($("#request-result").length > 0){
+        var resultContainser = $("#request-result");
+        resultContainser.empty();
+        
+        for(var i = 0; i < data.bucket.length; i++){
+            var bucket = data.bucket[i];
+            var bucketSpan = "<span>";
+            
+            bucketSpan += " start: ";
+            var startDate = new Date( parseInt(bucket.startTimeMillis) );
+            bucketSpan += startDate.toJSON();
+            
+            bucketSpan += " end: ";
+            var endDate = new Date( parseInt(bucket.endTimeMillis) );
+            bucketSpan += endDate.toJSON();
+            
+            var value = "";
+            switch(dataTypeName) {
+            case DataTypeName.CALORIES:
+            case DataTypeName.DISTANCE:
+                value = data.bucket[i].dataset[0].point[0].value[0].fpVal;
+                break;
+            case  DataTypeName.STEPS:
+                value = data.bucket[i].dataset[0].point[0].value[0].intVal; 
+                break;
+            case DataTypeName.ACTIVITIES:
+                
+                break;
+            default:
+                break;
+            }
+            
+            bucketSpan +=  " value: " + value;
+            
+            bucketSpan += "</span><br>";
+            
+            $(resultContainser).append(bucketSpan);
+        }
+    }
 }

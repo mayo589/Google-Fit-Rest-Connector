@@ -1,47 +1,50 @@
+var URL_FTINESS_API = "https://www.googleapis.com/fitness/v1/";
 
-/*
-$(document).ready(function () {
+var DataTypeName = {};
+DataTypeName.CALORIES = "com.google.calories.expended";
+DataTypeName.DISTANCE = "com.google.distance.delta";
+DataTypeName.STEPS = "com.google.step_count.delta";
+DataTypeName.ACTIVITIES = "com.google.activity.segment";
 
-    /*var today = new Date();
-    var startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate()-10, 0, 0, 0, 0);
-    var endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 0)
+var BucketTimeMillis = {};
+BucketTimeMillis.HOUR = 3600000;
+BucketTimeMillis.DAY = BucketTimeMillis.HOUR * 24;
+BucketTimeMillis.WEEK = BucketTimeMillis.DAY * 7;
+BucketTimeMillis.MONTH = BucketTimeMillis.DAY * 30;
 
-    getDistanceFromActivities(startDate, endDate, []);*/
-/*});
+    
 
-
-function getDistanceFromActivities(startDate, endDate, activityTypes){
-    //sessions = getSessions
-    //activitiesSessions = getActivitiesSessions(sessions)
-    //foreach activitySession getDistance 
-
-    getSessions(startDate, endDate);
-}
-
-function getSessions(startDate, endDate) {
+function getAggregatedData(dataTypeName, startDate, endDate, bucketMillis) {
+    var retVal = null;
+    var d =
+    {
+        "aggregateBy": 
+        [
+            {"dataTypeName": dataTypeName}
+        ],
+        "endTimeMillis": endDate.getTime().toString(),
+        "startTimeMillis": startDate.getTime().toString(),
+        "bucketByTime": {
+            "durationMillis": bucketMillis
+        }
+    };
+    
     jQuery.ajax({
-        url: 'https://www.googleapis.com/fitness/v1/users/me/sessions?startTime=' + GoogleRFC3339DateString(startDate) + '&endTime=' + GoogleRFC3339DateString(endDate) + '&access_token=' + ACCESS_TOKEN,
+        url: URL_FTINESS_API + 'users/me/dataset:aggregate',
+        type : 'post',
+        contentType: "application/json",
+        data: JSON.stringify(d), 
+        beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", "Bearer " + Cookies.get(COOKIE_ACCESS_TOKEN));
+        },
         success: function (result) {
             console.log(result);
+            retVal = result;
         },
         error: function () {
             
         },
         async: false
     });
+    return retVal;
 }
-
-
-
-
-function GoogleRFC3339DateString(d) {
-    function pad(n) { return n < 10 ? '0' + n : n }
-    return d.getUTCFullYear() + '-'
-         + pad(d.getUTCMonth() + 1) + '-'
-         + pad(d.getUTCDate()) + 'T'
-         + pad(d.getUTCHours()) + ':'
-         + pad(d.getUTCMinutes()) + ':'
-         + pad(d.getUTCMilliseconds()) + '.'
-         + pad(d.getUTCSeconds()) + 'Z'
-}
-*/

@@ -1,6 +1,10 @@
+
+//Replace these values with our google app credentials
 var CLIENT_SECRET = "KImNCJoWf9ldMwgyBOFVhYRa";
 var CLIENT_ID = "519142462708-vd13rctsh57jekelhrfhg0iajmot4os1.apps.googleusercontent.com";
 var CLIENT_REDIRECT = "http://localhost";
+
+
 
 var OAUTHURL = 'https://accounts.google.com/o/oauth2/auth';
 var SCOPES_FITNESS = 'https://www.googleapis.com/auth/fitness.activity.read+https://www.googleapis.com/auth/fitness.activity.write+https://www.googleapis.com/auth/fitness.body.read+https://www.googleapis.com/auth/fitness.body.write+https://www.googleapis.com/auth/fitness.location.read+https://www.googleapis.com/auth/fitness.location.write';
@@ -9,6 +13,12 @@ var COOKIE_GOOGLE_AUTH_CODE = "google_auth_code";
 var COOKIE_ACCESS_TOKEN = "google_access_token";
 var COOKIE_REFRESH_TOKEN = "google_refresh_token";
 
+
+/*
+    Initial request for Google authentication code
+    Opens google auth window
+    returns Google Auth token
+*/
 function requestGoogleoAuthCode() {    
     var deffer = new $.Deferred();
     var popupurl = OAUTHURL + '?scope=' + SCOPES_FITNESS + '&client_id=' + CLIENT_ID + '&redirect_uri=' + CLIENT_REDIRECT + '&response_type=code&approval_prompt=force&access_type=offline';
@@ -28,6 +38,11 @@ function requestGoogleoAuthCode() {
     return deffer.promise();
 }
 
+
+/*
+    Uses Google Auth code to get Access Token and Refresh Token
+    returns object with access token, refresh token and access token expiration
+*/
 function getAccessToken(google_auth_code) {
     var retVal = null;
     jQuery.ajax({
@@ -49,6 +64,11 @@ function getAccessToken(google_auth_code) {
     return retVal;
 }
 
+
+/*
+    Uses Refresh token to obtain new access token
+    returns new access token with expiration
+*/
 function refreshAccessToken(refresh_token) {
     var retVal = null;
     jQuery.ajax({
