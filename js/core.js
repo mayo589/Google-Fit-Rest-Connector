@@ -156,8 +156,18 @@ function parseAndDisplay(data, dataTypeName){
                 value = data.bucket[i].dataset[0].point[0].value[0].intVal; 
                 break;
             case DataTypeName.ACTIVITIES:
-                
+            {
+                value = "";
+                for(var j = 0; j < data.bucket[i].dataset[0].point.length; j++){
+                    var activity = data.bucket[i].dataset[0].point[j];
+                    value += "<br>";
+                    value += "Activity: " + activity.value[0].intVal;
+                    value += " Duration: " + activity.value[1].intVal;
+                    value += " Start: " +  (new Date( parseInt(activity.startTimeNanos.substr(0, activity.startTimeNanos.length-6) ))).toString();  
+                    value += " End: " +  (new Date( parseInt(activity.endTimeNanos.substr(0, activity.endTimeNanos.length-6) ))).toString();
+                }
                 break;
+            }
             default:
                 break;
             }
