@@ -129,50 +129,32 @@ function resetAccessToken(){
     window.location.reload();
 }
 
-function parseAndDisplay(data, dataTypeName){
+function parseAndDisplay(buckets){
     if($("#request-result").length > 0){
         var resultContainser = $("#request-result");
         resultContainser.empty();
         
-        for(var i = 0; i < data.bucket.length; i++){
-            var bucket = data.bucket[i];
+        for(var i = 0; i < buckets.length; i++){
+            var bucket = buckets[i];
             var bucketSpan = "<span>";
             
-            bucketSpan += " start: ";
-            var startDate = new Date( parseInt(bucket.startTimeMillis) );
-            bucketSpan += startDate.toJSON();
+            bucketSpan += " start: " + bucket.startDate.toString();
             
-            bucketSpan += " end: ";
-            var endDate = new Date( parseInt(bucket.endTimeMillis) );
-            bucketSpan += endDate.toJSON();
+            bucketSpan += " end: " + bucket.endDate.toString();
             
-            var value = "";
-            switch(dataTypeName) {
-            case DataTypeName.CALORIES:
-            case DataTypeName.DISTANCE:
-                value = data.bucket[i].dataset[0].point[0].value[0].fpVal;
-                break;
-            case  DataTypeName.STEPS:
-                value = data.bucket[i].dataset[0].point[0].value[0].intVal; 
-                break;
-            case DataTypeName.ACTIVITIES:
-            {
-                value = "";
-                for(var j = 0; j < data.bucket[i].dataset[0].point.length; j++){
-                    var activity = data.bucket[i].dataset[0].point[j];
-                    value += "<br>";
-                    value += "Activity: " + activity.value[0].intVal;
-                    value += " Duration: " + activity.value[1].intVal;
-                    value += " Start: " +  (new Date( parseInt(activity.startTimeNanos.substr(0, activity.startTimeNanos.length-6) ))).toString();  
-                    value += " End: " +  (new Date( parseInt(activity.endTimeNanos.substr(0, activity.endTimeNanos.length-6) ))).toString();
+            if(typeof bucket.value != "undefined"){
+                bucketSpan +=  " value: " + bucket.value;    
+            }
+            if(typeof bucket.activities != "undefined"){
+                for(var j = 0; j < bucket.activities.length; j++){
+                    var activity = bucket.activities[j];
+                    bucketSpan += "<br><span style='margin-left: 50px;'></span>";
+                    bucketSpan += " Activity type: " + activity.type; 
+                    bucketSpan += " Start: " + activity.startDate.toString();
+                    bucketSpan += " End: " + activity.endDate.toString();
+                    bucketSpan += " Duration: " + activity.durationMillis;
                 }
-                break;
             }
-            default:
-                break;
-            }
-            
-            bucketSpan +=  " value: " + value;
             
             bucketSpan += "</span><br>";
             

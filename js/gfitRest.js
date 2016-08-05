@@ -39,7 +39,43 @@ function getAggregatedData(dataTypeName, startDate, endDate, bucketMillis) {
         },
         success: function (result) {
             console.log(result);
-            retVal = result;
+            //retVal = result;
+            var returnBuckets = [];
+            for(var i = 0; i < result.bucket.length; i++){
+                var dataBucket = result.bucket[i];
+                
+                var bucketParsed = {};
+                bucketParsed.startDate = new Date( parseInt(dataBucket.startTimeMillis) );
+                bucketParsed.endDate = new Date( parseInt(dataBucket.endTimeMillis) );
+                
+                switch(dataTypeName) {
+                case DataTypeName.CALORIES:
+                case DataTypeName.DISTANCE:
+                    bucketParsed.value = dataBucket.dataset[0].point[0].value[0].fpVal;
+                    break;
+                case  DataTypeName.STEPS:
+                    bucketParsed.value = dataBucket.dataset[0].point[0].value[0].intVal; 
+                    break;
+                case DataTypeName.ACTIVITIES:
+                {
+                    bucketParsed.activities = [];
+                    for(var j = 0; j < dataBucket.dataset[0].point.length; j++){
+                        var activityData = dataBucket.dataset[0].point[j];
+                        var activityParsed = {};
+                        activityParsed.type = activityData.value[0].intVal;
+                        activityParsed.durationMillis = activityData.value[1].intVal;
+                        activityParsed.startDate =  (new Date( parseInt(activityData.startTimeNanos.substr(0, activityData.startTimeNanos.length-6) )));  
+                        activityParsed.endDate =  (new Date( parseInt(activityData.endTimeNanos.substr(0, activityData.endTimeNanos.length-6) )));
+                        bucketParsed.activities.push(activityParsed);
+                    }
+                    break;
+                }
+                default:
+                    break;
+                }
+                returnBuckets.push(bucketParsed);
+            }
+            retVal = returnBuckets;
         },
         error: function () {
             
