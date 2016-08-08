@@ -351,6 +351,42 @@ function displayCharts(){
             responsive: false
         }, 
     });
+    
+    var lastMonthActivities = getLastNMonthsActivities(1, 1);
+    var labels = [];
+    var pieData = [];
+    var piecolors = []
+    for(var ds in lastMonthActivities){
+        labels.push(lastMonthActivities[ds].label);
+        pieData.push(lastMonthActivities[ds].data[0]);    
+        piecolors.push(lastMonthActivities[ds].backgroundColor);
+    }
+    var ctxActivitiesMonthPie = document.getElementById("chart-month-pie");
+    var chartActivitiesMonthPie = new Chart(ctxActivitiesMonthPie, 
+    {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [
+            {
+                data: pieData,
+                backgroundColor: piecolors,
+            }],
+        },
+        options: {
+            tooltips: {
+                    mode: 'label', //single or label 
+                    callbacks: {
+                        label: function(item, data){
+                            var afterTitle = "";
+                            afterTitle += data.labels[item.index] + ": " + msToTime( data.datasets[item.datasetIndex].data[item.index] ); 
+                            return afterTitle;
+                        },
+                    }
+                },
+            responsive: false,
+        },
+    });
 }
 
 
