@@ -172,7 +172,7 @@ function displayCharts(){
             labels: getLastNMonthNames(6, 1),
             datasets: [{
                 label: 'Total Calories per month',
-                data: getLastNMonthsCalories(6, 1),
+                data: getLastNMonthsValues(6, 1, DataTypeName.CALORIES),
                 borderWidth: 1,
                 backgroundColor: "rgba(75,192,192,0.6)",
                 borderColor: "rgba(75,192,192,1)",
@@ -195,7 +195,7 @@ function displayCharts(){
                 callbacks: {
                     title: function(item, data) {
                         var title = "";
-                        title += "Total Calorie outtake in " + item[0].xLabel + ": " + item[0].yLabel;
+                        title += "Total Calorie outtake in " + item[0].xLabel + ": " + Math.round(item[0].yLabel);
                         return title;
                     },
                     label: function(item, data){
@@ -220,7 +220,7 @@ function displayCharts(){
             labels: getLastNMonthNames(6, 1),
             datasets: [{
                 label: 'Total Distance per month',
-                data: getLastNMonthsDistance(6, 1),
+                data: getLastNMonthsValues(6, 1, DataTypeName.DISTANCE),
                 borderWidth: 1,
                 backgroundColor: "rgba(63,191,63,0.6)",
                 borderColor: "rgba(63,191,63,1)",
@@ -267,7 +267,7 @@ function displayCharts(){
             labels: getLastNMonthNames(6, 1),
             datasets: [{
                 label: 'Total step count per month',
-                data: getLastNMonthsSteps(6, 1),
+                data: getLastNMonthsValues(6, 1, DataTypeName.STEPS),
                 borderWidth: 1,
                 backgroundColor: "rgba(191,63,63,0.6)",
                 borderColor: "rgba(191,63,63,1)",
@@ -389,11 +389,6 @@ function displayCharts(){
     });
 }
 
-
-
-
-
-
 var monthNames = ["January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December"
 ];
@@ -409,7 +404,6 @@ function getMonthByName(monthName){
     }
 }
 
-
 function getLastNMonthNames(numOfMonth, offset){
     var retMonthNames = [];
     for(var i = 0; i < numOfMonth; i++){
@@ -420,88 +414,93 @@ function getLastNMonthNames(numOfMonth, offset){
     return retMonthNames.reverse();
 }
 
-
-
-function getLastNMonthsCalories(numOfMonth, offset){
+function getLastNMonthsValues(numOfMonth, offset, dataType){
     var monthCals = [];
-    for(var i = 0; i < numOfMonth; i++){
-        var today = new Date();
-        var startDate = new Date(today.getFullYear(), today.getMonth()-i-offset, 1, 0, 0, 0, 0)
-        var endDate = new Date(today.getFullYear(), today.getMonth()-i-offset+1, 0, 0, 0, 0, 0)
-        
-        var result = getAggregatedData(DataTypeName.CALORIES, startDate, endDate, BucketTimeMillis.MONTH )
-        monthCals.push(Math.round(result[0].value));
+    var today = new Date();
+    var startDate = new Date(today.getFullYear(), today.getMonth()-numOfMonth-offset + 1, 1, 0, 0, 0, 0)
+    var endDate = new Date(today.getFullYear(), today.getMonth()-offset + 1, 0, 0, 0, 0, 0)
+    
+    var tmpDate = startDate;
+    
+    var numDays = days_between(startDate, endDate);
+    for(var i = 1; i <= numDays; i = i + 90){
+        var daysToAdd = 0;
+        if(i+90 <= numDays){
+            daysToAdd = 90;
+        }
+        else{
+            daysToAdd = numDays - i + 1;
+        }
+        var result = getAggregatedData(dataType, tmpDate, tmpDate.addDays(daysToAdd), BucketTimeMillis.DAY );
+        tmpDate = tmpDate.addDays(daysToAdd);
+    
+        for(var j = 0; j < result.length; j++){
+            if(typeof monthCals[result[j].endDate.getMonth()]  == "undefined")
+                monthCals[result[j].endDate.getMonth()] = 0;
+                    
+            monthCals[result[j].endDate.getMonth()] += result[j].value;
+        }
     }
-    return monthCals.reverse();
-}
-
-function getLastNMonthsSteps(numOfMonth, offset){
-    var monthCals = [];
-    for(var i = 0; i < numOfMonth; i++){
-        var today = new Date();
-        var startDate = new Date(today.getFullYear(), today.getMonth()-i-offset, 1, 0, 0, 0, 0)
-        var endDate = new Date(today.getFullYear(), today.getMonth()-i-offset+1, 0, 0, 0, 0, 0)
-        
-        var result = getAggregatedData(DataTypeName.STEPS, startDate, endDate, BucketTimeMillis.MONTH )
-        monthCals.push(Math.round(result[0].value));
-    }
-    return monthCals.reverse();
-}
-
-function getLastNMonthsDistance(numOfMonth, offset){
-    var monthDist = [];
-    for(var i = 0; i < numOfMonth; i++){
-        var today = new Date();
-        var startDate = new Date(today.getFullYear(), today.getMonth()-i-offset, 1, 0, 0, 0, 0)
-        var endDate = new Date(today.getFullYear(), today.getMonth()-i-offset+1, 0, 0, 0, 0, 0)
-        
-        var result = getAggregatedData(DataTypeName.DISTANCE, startDate, endDate, BucketTimeMillis.MONTH )
-        monthDist.push(Math.round(result[0].value) / 1000);
-    }
-    return monthDist.reverse();
+    return monthCals.filter(function(val){return val});
 }
 
 function getLastNMonthsActivities(numOfMonth, offset){
     var monthActivities = [];
     
-    for(var i = 0; i < numOfMonth; i++){
-        var today = new Date();
-        var startDate = new Date(today.getFullYear(), today.getMonth()-i-offset, 1, 0, 0, 0, 0)
-        var endDate = new Date(today.getFullYear(), today.getMonth()-i-offset+1, 0, 0, 0, 0, 0)
+    var today = new Date();
+    var startDate = new Date(today.getFullYear(), today.getMonth()-numOfMonth-offset + 1, 1, 0, 0, 0, 0)
+    var endDate = new Date(today.getFullYear(), today.getMonth()-offset + 1, 0, 0, 0, 0, 0)
+    
+    var tmpDate = startDate;
+    var numDays = days_between(startDate, endDate);
+    
+     for(var i = 1; i <= numDays; i = i + 90){
+        var daysToAdd = 0;
+        if(i+90 <= numDays){
+            daysToAdd = 90;
+        }
+        else{
+            daysToAdd = numDays - i + 1;
+        }
         
-        var result = getAggregatedData(DataTypeName.ACTIVITIES, startDate, endDate, BucketTimeMillis.MONTH )
-        
-        
-        for(var j = 0; j < result[0].activities.length; j++){
-            var activity = result[0].activities[j];
-            if(activity.name.match(/still/i) ||
-               activity.name.match(/sleep/i) ||
-               activity.name.match(/vehicle/i) ||
-               activity.name.match(/walking/i) ){
-                   continue;
-               }
+        var result = getAggregatedData(DataTypeName.ACTIVITIES, tmpDate, tmpDate.addDays(daysToAdd), BucketTimeMillis.DAY );
+        tmpDate = tmpDate.addDays(daysToAdd);
+    
+        for(var k = 0; k < result.length; k++){
             
-            if(typeof monthActivities[activity.type] == "undefined"){
-                var color = randomColor({
-                    luminosity: 'light',
-                    format: 'rgba',
-                    alpha: 0.6 
-                });
-                monthActivities[activity.type] = {
-                    label: activity.name,
-                 
-                    data: Array.apply(null, Array(numOfMonth)).map(function() { return 0 }),
-                    borderWidth: 1,
-                    backgroundColor: color,
-                    borderColor: color.replace("0.6", "1"),
-                    borderJoinStyle: 'miter',
-                    pointHitRadius: 10,       
-                };
+            for(var j = 0; j < result[k].activities.length; j++){
+                var activity = result[k].activities[j];
+                if(activity.name.match(/still/i) ||
+                activity.name.match(/sleep/i) ||
+                activity.name.match(/vehicle/i) ||
+                activity.name.match(/walking/i) ){
+                    continue;
+                }
                 
-            }
+                if(typeof monthActivities[activity.type] == "undefined"){
+                    var color = randomColor({
+                        luminosity: 'light',
+                        format: 'rgba',
+                        alpha: 0.6 
+                    });
+                    monthActivities[activity.type] = {
+                        label: activity.name,
+                    
+                        data: Array.apply(null, Array(numOfMonth)).map(function() { return 0 }),
+                        borderWidth: 1,
+                        backgroundColor: color,
+                        borderColor: color.replace("0.6", "1"),
+                        borderJoinStyle: 'miter',
+                        pointHitRadius: 10,       
+                    };
+                    
+                }
+                
+                monthActivities[activity.type].data[activity.startDate.getMonth() - startDate.getMonth()] += activity.durationMillis;
+            }        
             
-            monthActivities[activity.type].data[numOfMonth - i - 1] = activity.durationMillis;
-        }        
+            
+        }
     }
     return monthActivities.filter(function(val){return val});
 }
@@ -537,4 +536,18 @@ function msToTime(s, type) {
       retVal += secs + strSecs;
   }
   return retVal;
+}
+
+function days_between(date1, date2) {
+    var ONE_DAY = 1000 * 60 * 60 * 24;
+    var date1_ms = date1.getTime();
+    var date2_ms = date2.getTime();
+    var difference_ms = Math.abs(date1_ms - date2_ms);
+    return Math.round(difference_ms/ONE_DAY);
+}
+
+Date.prototype.addDays = function(days){
+    var dat = new Date(this.valueOf());
+    dat.setDate(dat.getDate() + days);
+    return dat;
 }

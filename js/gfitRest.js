@@ -69,15 +69,17 @@ function getAggregatedData(dataTypeName, startDate, endDate, bucketMillis) {
                 case DataTypeName.ACTIVITIES:
                 {
                     bucketParsed.activities = [];
-                    for(var j = 0; j < dataBucket.dataset[0].point.length; j++){
-                        var activityData = dataBucket.dataset[0].point[j];
-                        var activityParsed = {};
-                        activityParsed.type = activityData.value[0].intVal;
-                        activityParsed.name = activityTypes[activityParsed.type]; 
-                        activityParsed.durationMillis = activityData.value[1].intVal;
-                        activityParsed.startDate =  (new Date( parseInt(activityData.startTimeNanos.substr(0, activityData.startTimeNanos.length-6) )));  
-                        activityParsed.endDate =  (new Date( parseInt(activityData.endTimeNanos.substr(0, activityData.endTimeNanos.length-6) )));
-                        bucketParsed.activities.push(activityParsed);
+                    if(typeof dataBucket.dataset[0].point != "undefined"){
+                        for(var j = 0; j < dataBucket.dataset[0].point.length; j++){
+                            var activityData = dataBucket.dataset[0].point[j];
+                            var activityParsed = {};
+                            activityParsed.type = activityData.value[0].intVal;
+                            activityParsed.name = activityTypes[activityParsed.type]; 
+                            activityParsed.durationMillis = activityData.value[1].intVal;
+                            activityParsed.startDate =  (new Date( parseInt(activityData.startTimeNanos.substr(0, activityData.startTimeNanos.length-6) )));  
+                            activityParsed.endDate =  (new Date( parseInt(activityData.endTimeNanos.substr(0, activityData.endTimeNanos.length-6) )));
+                            bucketParsed.activities.push(activityParsed);
+                        }
                     }
                     break;
                 }
