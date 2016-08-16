@@ -69,6 +69,7 @@ $(document).ready(function () {
         $("#not-logged").hide();
         $("#logged-in").show();
         displayCharts();
+        displayCalendar();
     }
     else{
         $("#not-logged").show();
@@ -164,6 +165,8 @@ function parseAndDisplay(buckets){
 }
 
 function displayCharts(){
+    
+    
     var ctxCals = document.getElementById("chart-calories");
     var chartCals = new Chart(ctxCals, 
     {
@@ -306,7 +309,14 @@ function displayCharts(){
         }, 
     });
     
+    
+    
+    
+    
+    
     var datasetActivities = getLastNMonthsActivities(6, 1);
+    
+    
     var ctxActivities = document.getElementById("chart-activities");
     var chartActivities = new Chart(ctxActivities, 
     {
@@ -387,6 +397,53 @@ function displayCharts(){
             responsive: false,
         },
     });
+}
+
+function displayCalendar(){
+    jQuery('#stats-calendar').datetimepicker({
+        format:'d.m.Y',
+        inline:true,
+        timepicker:false,
+        defaultDate: (new Date()).setHours(0,0,0,0),
+        onChangeDateTime: function(current_time,$input){
+            renderCalendarDayStats(current_time);
+        },
+        onGenerate: function(current_time,$input){
+            $(this).addClass("stats-calendar-container"); //For css styling      
+            renderCalendarDayStats(current_time);
+        }
+    });    
+}
+
+function renderCalendarDayStats(current_time){
+    $("#stats-calendar-day .day-header td:nth-child(2)").text(current_time.toDateString());
+            
+    var cals = getAggregatedData(DataTypeName.CALORIES, current_time, (current_time).addDays(1), BucketTimeMillis.DAY )[0].value;
+    $("#stats-calendar-day .day-cals td:nth-child(2)").text(Math.round(cals));
+
+    var dist = getAggregatedData(DataTypeName.DISTANCE, current_time, (current_time).addDays(1), BucketTimeMillis.DAY )[0].value;
+    $("#stats-calendar-day .day-distance td:nth-child(2)").text(Math.round(dist));
+
+    var steps = getAggregatedData(DataTypeName.STEPS, current_time, (current_time).addDays(1), BucketTimeMillis.DAY )[0].value;
+    $("#stats-calendar-day .day-steps td:nth-child(2)").text(steps);
+
+    $("#stats-calendar-day .day-activity").remove();
+    var activitiesResult = getAggregatedData(DataTypeName.ACTIVITIES, current_time, (current_time).addDays(1), BucketTimeMillis.DAY );
+    for(var i = 0; i < activitiesResult[0].activities.length; i++){
+        var activity = activitiesResult[0].activities[i];
+        if(activity.name.match(/still/i) ||
+        activity.name.match(/sleep/i) ||
+        activity.name.match(/vehicle/i) ||
+        activity.name.match(/walking/i) ){
+            continue;
+        }
+        
+        $("#stats-calendar-day .day-activities").parent().append("<tr class='day-activity'><td>" + activity.name + "</td><td>" + msToTime(activity.durationMillis, "short") + "</td></tr>");
+    }
+    
+    if($("#stats-calendar-day .day-activity") == null || $("#stats-calendar-day .day-activity").length == 0){
+        $("#stats-calendar-day .day-activities").parent().append("<tr class='day-activity'><td colspan='2'>No activities</td></tr>");
+    }
 }
 
 var monthNames = ["January", "February", "March", "April", "May", "June",

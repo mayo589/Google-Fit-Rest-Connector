@@ -1,0 +1,17 @@
+.stats-calendar-container{
+    float: left;
+}
+
+.stats-calendar-container .xdsoft_datepicker{
+    width: 600px;
+}
+
+.stats-calendar-container .xdsoft_calendar table tbody tr td {
+    width: 80px;
+    height: 50px;
+    text-align: center;
+}
+
+#stats-calendar-day {
+    float: left;
+}
