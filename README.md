@@ -30,16 +30,16 @@ var CLIENT_REDIRECT = "<Client Redirect>";
 
 Overview of Distance, Steps and Calories over 6 months:
 
-![Google Fit REST Connector](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Example")
+![Google Fit REST Connector](https://github.com/mayo589/Google-Fit-Rest-Connector/blob/master/img/month-stats.png "Example")
 
 Last 6 month sport activities:
 
-![Google Fit REST Connector](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Example")
+![Google Fit REST Connector](https://github.com/mayo589/Google-Fit-Rest-Connector/blob/master/img/month-overview.png "Example")
 
 
 Calendar view of specific day:
 
-![Google Fit REST Connector](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Example")
+![Google Fit REST Connector](https://github.com/mayo589/Google-Fit-Rest-Connector/blob/master/img/calendar-overview.png "Example")
 
 ### License
 This API connector is released under MIT License, however other tools and framework it uses might have different licenses.
