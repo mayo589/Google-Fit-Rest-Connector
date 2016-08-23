@@ -1,3 +1,11 @@
+/*
+    Author:     Marek Mihalech
+    Year:       2016
+    
+    Description:
+    Basic functionalities for setiing up oAuth connection for Google APIs
+*/
+
 var URL_FTINESS_API = "https://www.googleapis.com/fitness/v1/";
 
 var DataTypeName = {};
@@ -12,8 +20,11 @@ BucketTimeMillis.DAY = BucketTimeMillis.HOUR * 24;
 BucketTimeMillis.WEEK = BucketTimeMillis.DAY * 7;
 BucketTimeMillis.MONTH = BucketTimeMillis.DAY * 30;
 
-    
-
+/*
+    Basic function for quering Google FIT Api.
+    Runs synchronously.
+    returns queried data in array of buckets
+*/
 function getAggregatedData(dataTypeName, startDate, endDate, bucketMillis) {
     var retVal = null;
     var d =
@@ -98,6 +109,10 @@ function getAggregatedData(dataTypeName, startDate, endDate, bucketMillis) {
     return retVal;
 }
 
+
+/*
+    returns Activity index by Activity name
+*/
 function getActivityTypeIndex(name){
     for(var i = 0; i < activityTypes.length; i++){
         if(name == activityTypes[i])
@@ -105,6 +120,10 @@ function getActivityTypeIndex(name){
     }
 }
 
+
+/*
+    Array of supported Google Fit Activity types
+*/
 var activityTypes = [];
 activityTypes[0]= 'In vehicle';
 activityTypes[1]= 'Biking';

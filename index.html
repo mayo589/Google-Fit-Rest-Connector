@@ -1,60 +1,56 @@
 <html>
-  <head>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="./js/randomColor/randomColor.js"></script>
-    <script src="./js/datetimepicker/jquery.datetimepicker.js"></script>
-    <script src="./js/chartjs/chart.js"></script>
-    <script src="./js/cookiejs/cookie.js" type="text/javascript"></script>
-    <script src="./js/oAuth2utils.js" type="text/javascript"></script>
-    <script src="./js/gfitRest.js" type="text/javascript"></script>
-    <script src="./js/core.js" type="text/javascript"></script>
-    
-    <link rel="stylesheet" type="text/css" href="./css/jquery.datetimepicker.css"/>
-    <link rel="stylesheet" type="text/css" href="./css/styles.css"/>
-    
-  </head>
 
-  <body>
-    
-    GOOGLE_AUTH_CODE: <input id="inp-google-auth-code" style="width: 500px;">
-    <br/>
-    ACCESS_TOKEN: <input id="inp-access_token" style="width: 500px;"> <input type="button" value="RESET" onclick="resetAccessToken()">
-    <br/>
-    REFRESH_TOKEN: <input id="inp-refresh-token" style="width: 500px;">
-    <br/>
-    These value are stored into browser cookies. Reset these cookies <input type="button" value="Reset" onclick="resetCookies()">
-    <hr>
-    
-    <div id="not-logged">
-        You are not logged. Please <input type="button" onclick="requestGoogleAuthToken()" value="login">
-    </div>
-    
-    <div id="logged-in">
-        Logged in!
-        <br />
-        Data type: 
-        <select id="select-datatype">
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="./js/randomColor/randomColor.js"></script>
+  <script src="./js/datetimepicker/jquery.datetimepicker.js"></script>
+  <script src="./js/chartjs/chart.js"></script>
+  <script src="./js/cookiejs/cookie.js" type="text/javascript"></script>
+  <script src="./js/oAuth2utils.js" type="text/javascript"></script>
+  <script src="./js/gfitRest.js" type="text/javascript"></script>
+  <script src="./js/utilities.js" type="text/javascript"></script>
+  <script src="./js/stats.js" type="text/javascript"></script>
+  <script src="./js/core.js" type="text/javascript"></script>
+
+  <link rel="stylesheet" type="text/css" href="./css/jquery.datetimepicker.css" />
+  <link rel="stylesheet" type="text/css" href="./css/styles.css" />
+
+</head>
+
+<body>
+
+  GOOGLE_AUTH_CODE: <input id="inp-google-auth-code" style="width: 500px;">
+  <br/> ACCESS_TOKEN: <input id="inp-access_token" style="width: 500px;"> <input type="button" value="RESET" onclick="resetAccessToken()">
+  <br/> REFRESH_TOKEN: <input id="inp-refresh-token" style="width: 500px;">
+  <br/> These value are stored into browser cookies. Reset these cookies <input type="button" value="Reset" onclick="resetCookies()">
+  <hr>
+
+  <div id="not-logged">
+    You are not logged. Please <input type="button" onclick="requestGoogleAuthToken()" value="login">
+  </div>
+
+  <div id="logged-in">
+    Logged in!
+    <br /> Data type:
+    <select id="select-datatype">
           <option value="calories">Calories</option>
           <option value="steps">Steps</option>
           <option value="distance">Distance</option>
           <option value="activities">Activities</option>
-        </select>
-        Start Date: <input id="startDatePicker">
-        End Date: <input id="endDatePicker">
-        Bucket by:
-        <select id="select-bucketby">
+        </select> Start Date: <input id="startDatePicker"> End Date: <input id="endDatePicker"> Bucket by:
+    <select id="select-bucketby">
           <option value="hour">Hour</option>
           <option value="day">Day</option>
           <option value="week">Week</option>
           <option value="month">Month</option>
         </select>
-        <input type="button" value="Request" id="btn-request">
-        
-        <br>
-        <br>
-        <div id="request-result"></div>
-    </div>
-    
+    <input type="button" value="Request" id="btn-request" onclick="btnRequestClick()">
+
+    <br>
+    <br>
+    <div id="request-result"></div>
+
+
     <div id="stats">
       <hr>
       <canvas id="chart-calories" width="400" height="250" style="display: inline-block;"></canvas>
@@ -66,27 +62,28 @@
       <br><br>
       <input id="stats-calendar" type="text">
       <table id="stats-calendar-day">
-          <tr class="day-header">
-            <td>Date</td>
-            <td></td>
-          </tr>
-          <tr class="day-steps">
-            <td>Steps</td>
-            <td></td>
-          </tr>
-          <tr class="day-cals">
-            <td>Calories</td>
-            <td></td>
-          </tr>
-          <tr class="day-distance">
-            <td>Distance</td>
-            <td></td>
-          </tr>
-          <tr class="day-activities">
-            <td colspan="2">Sport Activities</td>
-          </tr>
+        <tr class="day-header">
+          <td>Date</td>
+          <td></td>
+        </tr>
+        <tr class="day-steps">
+          <td>Steps</td>
+          <td></td>
+        </tr>
+        <tr class="day-cals">
+          <td>Calories</td>
+          <td></td>
+        </tr>
+        <tr class="day-distance">
+          <td>Distance</td>
+          <td></td>
+        </tr>
+        <tr class="day-activities">
+          <td colspan="2"><b>Sport Activities</b></td>
+        </tr>
       </table>
     </div>
-    
-  </body>
+  </div>
+</body>
+
 </html>

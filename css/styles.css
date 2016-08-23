@@ -15,3 +15,10 @@
 #stats-calendar-day {
     float: left;
 }
+
+#stats-calendar-day tr:first-child td{
+    font-weight: bold;
+}
+#stats-calendar-day td{
+    padding: 10px;
+}

@@ -1,9 +1,18 @@
+/*
+    Author:     Marek Mihalech
+    Year:       2016
+    
+    Description:
+    Basic functionalities for setiing up oAuth connection for Google APIs
+*/
 
-//Replace these values with our google app credentials
+
+//Configuration
+//Replace these values with your google app credentials
 var CLIENT_SECRET = "KImNCJoWf9ldMwgyBOFVhYRa";
 var CLIENT_ID = "519142462708-vd13rctsh57jekelhrfhg0iajmot4os1.apps.googleusercontent.com";
 var CLIENT_REDIRECT = "http://localhost";
-
+//End-Configuration
 
 
 var OAUTHURL = 'https://accounts.google.com/o/oauth2/auth';
