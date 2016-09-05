@@ -4,17 +4,28 @@
 */
 
 function displayCharts(){
-    displayChartCalories();
-    displayChartDistance();
-    displayChartSteps();
-    displayChartActivities();
-    displayMonthPieChartActivities();
+    $.when(getLastNMonthsValues(6, 1, DataTypeName.CALORIES)).then(function (dataCals) {
+        displayChartCalories(dataCals); 
+    });
+
+    $.when(getLastNMonthsValues(6, 1, DataTypeName.DISTANCE)).then(function (dataDistance) {
+        displayChartDistance(dataDistance); 
+    });
+
+    $.when(getLastNMonthsValues(6, 1, DataTypeName.STEPS)).then(function (dataSteps) {
+        displayChartSteps(dataSteps); 
+    });
+
+    $.when( getLastNMonthsActivities(6, 1)).then(function (dataActivities) {
+        displayChartActivities(dataActivities);
+    });
+    
+    $.when( getLastNMonthsActivities(1, 1) ).then(function (dataMonthPie) {
+        displayMonthPieChartActivities(dataMonthPie);
+    });
 }
 
-function displayChartCalories() {
-
-    var dataCals = getLastNMonthsValues(6, 1, DataTypeName.CALORIES);
-    
+function displayChartCalories(dataCals) {
     var ctxCals = document.getElementById("chart-calories");
     var chartCals = new Chart(ctxCals,
         {
@@ -63,7 +74,7 @@ function displayChartCalories() {
         });
 }
 
-function displayChartDistance(){
+function displayChartDistance(dataDistance){
     var ctxDist = document.getElementById("chart-distance");
     var chartDistance = new Chart(ctxDist, 
     {
@@ -72,7 +83,7 @@ function displayChartDistance(){
             labels: getLastNMonthNames(6, 1),
             datasets: [{
                 label: 'Total Distance per month',
-                data: getLastNMonthsValues(6, 1, DataTypeName.DISTANCE),
+                data: dataDistance,
                 borderWidth: 1,
                 backgroundColor: "rgba(63,191,63,0.6)",
                 borderColor: "rgba(63,191,63,1)",
@@ -112,7 +123,7 @@ function displayChartDistance(){
     });
 }
 
-function displayChartSteps(){
+function displayChartSteps(dataSteps){
     var ctxSteps = document.getElementById("chart-steps");
     var chartSteps = new Chart(ctxSteps, 
     {
@@ -121,7 +132,7 @@ function displayChartSteps(){
             labels: getLastNMonthNames(6, 1),
             datasets: [{
                 label: 'Total step count per month',
-                data: getLastNMonthsValues(6, 1, DataTypeName.STEPS),
+                data: dataSteps,
                 borderWidth: 1,
                 backgroundColor: "rgba(191,63,63,0.6)",
                 borderColor: "rgba(191,63,63,1)",
@@ -161,14 +172,14 @@ function displayChartSteps(){
     });
 }
 
-function displayChartActivities(){
+function displayChartActivities(dataActivities){
     var ctxActivities = document.getElementById("chart-activities");
     var chartActivities = new Chart(ctxActivities, 
     {
         type: 'line',
         data: {
             labels: getLastNMonthNames(6, 1),
-            datasets: getLastNMonthsActivities(6, 1), 
+            datasets: dataActivities, 
         },
         options: {
             scales: {
@@ -208,8 +219,8 @@ function displayChartActivities(){
     });
 }
 
-function displayMonthPieChartActivities(){
-    var lastMonthActivities = getLastNMonthsActivities(1, 1);
+function displayMonthPieChartActivities(dataMonthPie){
+    var lastMonthActivities = dataMonthPie;
     var labels = [];
     var pieData = [];
     var piecolors = [];
@@ -265,29 +276,37 @@ function displayCalendar(){
 function displayCalendarDayStats(current_time){
     $("#stats-calendar-day .day-header td:nth-child(2)").text(current_time.toDateString());
             
-    var cals = getAggregatedData(DataTypeName.CALORIES, current_time, (current_time).addDays(1), BucketTimeMillis.DAY )[0].value;
-    $("#stats-calendar-day .day-cals td:nth-child(2)").text(Math.round(cals));
+    $.when(getAggregatedData(DataTypeName.CALORIES, current_time, (current_time).addDays(1), BucketTimeMillis.DAY )).then(function (d){
+        var cals = d[0].value;
+        $("#stats-calendar-day .day-cals td:nth-child(2)").text(Math.round(cals));
+    });
 
-    var dist = getAggregatedData(DataTypeName.DISTANCE, current_time, (current_time).addDays(1), BucketTimeMillis.DAY )[0].value;
-    $("#stats-calendar-day .day-distance td:nth-child(2)").text(Math.round(dist));
+    $.when(getAggregatedData(DataTypeName.DISTANCE, current_time, (current_time).addDays(1), BucketTimeMillis.DAY )).then(function (d){
+        var dist = d[0].value;
+        $("#stats-calendar-day .day-distance td:nth-child(2)").text(Math.round(dist));
+    });
 
-    var steps = getAggregatedData(DataTypeName.STEPS, current_time, (current_time).addDays(1), BucketTimeMillis.DAY )[0].value;
-    $("#stats-calendar-day .day-steps td:nth-child(2)").text(steps);
-
-    $("#stats-calendar-day .day-activity").remove();
-    var activitiesResult = getAggregatedData(DataTypeName.ACTIVITIES, current_time, (current_time).addDays(1), BucketTimeMillis.DAY );
-    for(var i = 0; i < activitiesResult[0].activities.length; i++){
-        var activity = activitiesResult[0].activities[i];
-        if(!isActivitySport(activity.name) ){
-            continue;
-        }
-        
-        $("#stats-calendar-day .day-activities").parent().append("<tr class='day-activity'><td>" + activity.name + "</td><td>" + msToTime(activity.durationMillis, "short") + "</td></tr>");
-    }
+    $.when(getAggregatedData(DataTypeName.STEPS, current_time, (current_time).addDays(1), BucketTimeMillis.DAY )).then(function (d){
+        var steps = d[0].value;
+        $("#stats-calendar-day .day-steps td:nth-child(2)").text(steps);    
+    });
     
-    if($("#stats-calendar-day .day-activity") === null || $("#stats-calendar-day .day-activity").length === 0){
-        $("#stats-calendar-day .day-activities").parent().append("<tr class='day-activity'><td colspan='2'>No activities</td></tr>");
-    }
+    $("#stats-calendar-day .day-activity").remove();
+    
+    $.when(getAggregatedData(DataTypeName.ACTIVITIES, current_time, (current_time).addDays(1), BucketTimeMillis.DAY )).then(function (d){
+        var activitiesResult = d;
+        for(var i = 0; i < activitiesResult[0].activities.length; i++){
+            var activity = activitiesResult[0].activities[i];
+            if(!isActivitySport(activity.name) ){
+                continue;
+            } 
+            $("#stats-calendar-day .day-activities").parent().append("<tr class='day-activity'><td>" + activity.name + "</td><td>" + msToTime(activity.durationMillis, "short") + "</td></tr>");
+        }
+
+        if($("#stats-calendar-day .day-activity") === null || $("#stats-calendar-day .day-activity").length === 0){
+            $("#stats-calendar-day .day-activities").parent().append("<tr class='day-activity'><td colspan='2'>No activities</td></tr>");
+        }
+    });   
 }
 
 function getLastNMonthsValues(numOfMonth, offset, dataType){
@@ -301,30 +320,35 @@ function getLastNMonthsValues(numOfMonth, offset, dataType){
     var tmpDate = startDate;
     
     var numDays = days_between(startDate, endDate);
+    var requests = [];
     //Maximum treshold for query is 90 days
     for(var i = 1; i <= numDays; i = i + 90){
         var daysToAdd = 0;
-        if(i+90 <= numDays){
+        if(i+90 <= numDays)
             daysToAdd = 90;
-        }
-        else{
+        else
             daysToAdd = numDays - i + 1;
-        }
-        var result = getAggregatedData(dataType, tmpDate, tmpDate.addDays(daysToAdd), BucketTimeMillis.DAY );
+        
+        requests.push(getAggregatedData(dataType, tmpDate, tmpDate.addDays(daysToAdd), BucketTimeMillis.DAY ) );
         tmpDate = tmpDate.addDays(daysToAdd);
-    
-        for(var j = 0; j < result.length; j++){
-            if(typeof monthCals[result[j].endDate.getMonth()]  == "undefined")
-                monthCals[result[j].endDate.getMonth()] = 0;
-                    
-            monthCals[result[j].endDate.getMonth()] += result[j].value;
-        }
     }
-    return monthCals.filter(function(val){return val;});
-    //return defer.promise();
+
+    $.when.apply($, requests).done(function () {
+        $.each(arguments, function (i, data) {
+            for(var j = 0; j < data.length; j++){
+                if(typeof monthCals[data[j].endDate.getMonth()]  == "undefined")
+                    monthCals[data[j].endDate.getMonth()] = 0;
+             
+                monthCals[data[j].endDate.getMonth()] += data[j].value;
+            }
+        });
+        return defer.resolve(monthCals.filter(function(val){return val;}));
+    });
+    return defer.promise();
 }
 
 function getLastNMonthsActivities(numOfMonth, offset) {
+    var defer = $.Deferred();
     var monthActivities = [];
 
     var today = new Date();
@@ -334,43 +358,50 @@ function getLastNMonthsActivities(numOfMonth, offset) {
     var tmpDate = startDate;
     var numDaysBetween = days_between(startDate, endDate);
 
+    var requests = [];
     //Maximum treshold for query is 90 days
     for (var i = 1; i <= numDaysBetween; i = i + 90) {
         var daysToAdd = (i + 90 <= numDaysBetween) ? 90 :  (numDaysBetween - i + 1);
 
-        var result = getAggregatedData(DataTypeName.ACTIVITIES, tmpDate, tmpDate.addDays(daysToAdd), BucketTimeMillis.DAY);
+        requests.push(getAggregatedData(DataTypeName.ACTIVITIES, tmpDate, tmpDate.addDays(daysToAdd), BucketTimeMillis.DAY));
         tmpDate = tmpDate.addDays(daysToAdd);
-
-        for (var k = 0; k < result.length; k++) {
-            for (var j = 0; j < result[k].activities.length; j++) {
-                var activity = result[k].activities[j];
-                if (!isActivitySport(activity.name)) {
-                    continue;
-                }
-
-                if (typeof monthActivities[activity.type] == "undefined") {
-                    var color = randomColor({
-                        luminosity: 'light',
-                        format: 'rgba',
-                        alpha: 0.6
-                    });
-                    monthActivities[activity.type] = {
-                        label: activity.name,
-                        data: Array.apply(null, Array(numOfMonth)).map(function () { return 0; }),
-                        borderWidth: 1,
-                        backgroundColor: color,
-                        borderColor: color.replace("0.6", "1"),
-                        borderJoinStyle: 'miter',
-                        pointHitRadius: 10,
-                    };
-
-                }
-
-                monthActivities[activity.type].data[activity.startDate.getMonth() - startDate.getMonth()] += activity.durationMillis;
-            }
-        }
     }
-    return monthActivities.filter(function (val) { return val; });
+
+    $.when.apply($, requests).done(function () {
+        $.each(arguments, function (i, data) {
+            for (var k = 0; k < data.length; k++) {
+                for (var j = 0; j < data[k].activities.length; j++) {
+                    var activity = data[k].activities[j];
+                    if (!isActivitySport(activity.name)) {
+                        continue;
+                    }
+
+                    if (typeof monthActivities[activity.type] == "undefined") {
+                        var color = randomColor({
+                            luminosity: 'light',
+                            format: 'rgba',
+                            alpha: 0.6
+                        });
+                        monthActivities[activity.type] = {
+                            label: activity.name,
+                            data: Array.apply(null, Array(numOfMonth)).map(function () { return 0; }),
+                            borderWidth: 1,
+                            backgroundColor: color,
+                            borderColor: color.replace("0.6", "1"),
+                            borderJoinStyle: 'miter',
+                            pointHitRadius: 10,
+                        };
+
+                    }
+
+                    monthActivities[activity.type].data[activity.startDate.getMonth() - startDate.getMonth()] += activity.durationMillis;
+                }
+            }
+        });
+        return defer.resolve(monthActivities.filter(function (val) { return val; }));
+    });
+
+    return defer.promise();
 }
 
 function isActivitySport(activityName){

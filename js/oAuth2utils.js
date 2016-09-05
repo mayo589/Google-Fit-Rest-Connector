@@ -16,7 +16,7 @@ var CLIENT_REDIRECT = "http://localhost";
 
 
 var OAUTHURL = 'https://accounts.google.com/o/oauth2/auth';
-var SCOPES_FITNESS = 'https://www.googleapis.com/auth/fitness.activity.read+https://www.googleapis.com/auth/fitness.activity.write+https://www.googleapis.com/auth/fitness.body.read+https://www.googleapis.com/auth/fitness.body.write+https://www.googleapis.com/auth/fitness.location.read+https://www.googleapis.com/auth/fitness.location.write';
+var SCOPES_FITNESS = 'https://www.googleapis.com/auth/fitness.activity.read+https://www.googleapis.com/auth/fitness.body.read+https://www.googleapis.com/auth/fitness.location.read';
     
 var COOKIE_GOOGLE_AUTH_CODE = "google_auth_code";
 var COOKIE_ACCESS_TOKEN = "google_access_token";

@@ -26,6 +26,8 @@ BucketTimeMillis.MONTH = BucketTimeMillis.DAY * 30;
     returns queried data in array of buckets
 */
 function getAggregatedData(dataTypeName, startDate, endDate, bucketMillis) {
+    var defer = $.Deferred();
+
     var retVal = null;
     var d =
     {
@@ -40,7 +42,7 @@ function getAggregatedData(dataTypeName, startDate, endDate, bucketMillis) {
         }
     };
     
-    jQuery.ajax({
+     jQuery.ajax({
         url: URL_FTINESS_API + 'users/me/dataset:aggregate',
         type : 'post',
         contentType: "application/json",
@@ -100,13 +102,15 @@ function getAggregatedData(dataTypeName, startDate, endDate, bucketMillis) {
                 returnBuckets.push(bucketParsed);
             }
             retVal = returnBuckets;
+            defer.resolve( retVal );
         },
         error: function () {
-            
+            defer.reject();
         },
-        async: false
+        async: true
     });
-    return retVal;
+
+    return defer;
 }
 
 
