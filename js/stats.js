@@ -17,7 +17,7 @@ function displayCharts(){
     });
 
     $.when( getLastNMonthsActivities(6, 1)).then(function (dataActivities) {
-        displayChartActivities(dataActivities);
+        displayChartActivities(dataActivities, 6, 1);
     });
     
     $.when( getLastNMonthsActivities(1, 1) ).then(function (dataMonthPie) {
@@ -172,13 +172,13 @@ function displayChartSteps(dataSteps){
     });
 }
 
-function displayChartActivities(dataActivities){
+function displayChartActivities(dataActivities, numOfMonth, offset){
     var ctxActivities = document.getElementById("chart-activities");
     var chartActivities = new Chart(ctxActivities, 
     {
         type: 'line',
         data: {
-            labels: getLastNMonthNames(6, 1),
+            labels: getLastNMonthNames(numOfMonth, offset),
             datasets: dataActivities, 
         },
         options: {
@@ -263,9 +263,9 @@ function displayCalendar(){
         inline:true,
         timepicker:false,
         defaultDate: (new Date()).setHours(0,0,0,0),
-        onChangeDateTime: function(current_time,$input){
+        /*onChangeDateTime: function(current_time,$input){
             displayCalendarDayStats(current_time);
-        },
+        },*/
         onGenerate: function(current_time,$input){
             $(this).addClass("stats-calendar-container"); //For css styling      
             displayCalendarDayStats(current_time);
@@ -293,13 +293,15 @@ function displayCalendarDayStats(current_time){
     
     $("#stats-calendar-day .day-activity").remove();
     
-    $.when(getAggregatedData(DataTypeName.ACTIVITIES, current_time, (current_time).addDays(1), BucketTimeMillis.DAY )).then(function (d){
+    $.when(getAggregatedData(DataTypeName.ACTIVITIES, current_time, (current_time).addDays(1), BucketTimeMillis.DAY )).done(function (d){
         var activitiesResult = d;
+        var activitiesHTML = "";
         for(var i = 0; i < activitiesResult[0].activities.length; i++){
             var activity = activitiesResult[0].activities[i];
             if(!isActivitySport(activity.name) ){
                 continue;
             } 
+            //$("#stats-calendar-day .day-activities").parent().append
             $("#stats-calendar-day .day-activities").parent().append("<tr class='day-activity'><td>" + activity.name + "</td><td>" + msToTime(activity.durationMillis, "short") + "</td></tr>");
         }
 
