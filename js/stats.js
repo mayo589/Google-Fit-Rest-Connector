@@ -324,10 +324,10 @@ function getLastNMonthsValues(numOfMonth, offset, dataType){
     var numDays = days_between(startDate, endDate);
     var requests = [];
     //Maximum treshold for query is 90 days
-    for(var i = 1; i <= numDays; i = i + 90){
+    for(var i = 1; i <= numDays; i = i + 89){
         var daysToAdd = 0;
-        if(i+90 <= numDays)
-            daysToAdd = 90;
+        if(i+89 <= numDays)
+            daysToAdd = 89;
         else
             daysToAdd = numDays - i + 1;
         
@@ -362,8 +362,8 @@ function getLastNMonthsActivities(numOfMonth, offset) {
 
     var requests = [];
     //Maximum treshold for query is 90 days
-    for (var i = 1; i <= numDaysBetween; i = i + 90) {
-        var daysToAdd = (i + 90 <= numDaysBetween) ? 90 :  (numDaysBetween - i + 1);
+    for (var i = 1; i <= numDaysBetween; i = i + 89) {
+        var daysToAdd = (i + 89 <= numDaysBetween) ? 89 :  (numDaysBetween - i + 1);
 
         requests.push(getAggregatedData(DataTypeName.ACTIVITIES, tmpDate, tmpDate.addDays(daysToAdd), BucketTimeMillis.DAY));
         tmpDate = tmpDate.addDays(daysToAdd);
@@ -396,7 +396,12 @@ function getLastNMonthsActivities(numOfMonth, offset) {
 
                     }
 
-                    monthActivities[activity.type].data[activity.startDate.getMonth() - startDate.getMonth()] += activity.durationMillis;
+                    var monthIndex;
+                    if(activity.startDate.getMonth() - startDate.getMonth() >= 0)
+                        monthIndex = activity.startDate.getMonth() - startDate.getMonth();
+                    else
+                        monthIndex = activity.startDate.getMonth() + (12 - startDate.getMonth());
+                    monthActivities[activity.type].data[monthIndex] += activity.durationMillis;
                 }
             }
         });
@@ -410,5 +415,5 @@ function isActivitySport(activityName){
     return  !(activityName.match(/still/i) ||
             activityName.match(/sleep/i) ||
             activityName.match(/vehicle/i) ||
-            activityName.match(/walking/i));
+            activityName.toLowerCase() == "walking");
 } 

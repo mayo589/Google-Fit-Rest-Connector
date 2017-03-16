@@ -64,7 +64,8 @@ function getAggregatedData(dataTypeName, startDate, endDate, bucketMillis) {
                 switch(dataTypeName) {
                 case DataTypeName.CALORIES:
                 case DataTypeName.DISTANCE:
-                    if(typeof dataBucket.dataset[0].point != "undefined"){
+                    if(typeof dataBucket.dataset[0].point != "undefined" &&
+                        typeof dataBucket.dataset[0].point[0] != "undefined"){
                         bucketParsed.value = dataBucket.dataset[0].point[0].value[0].fpVal;
                     }
                     else{
@@ -72,7 +73,8 @@ function getAggregatedData(dataTypeName, startDate, endDate, bucketMillis) {
                     }
                     break;
                 case  DataTypeName.STEPS:
-                    if(typeof dataBucket.dataset[0].point != "undefined"){
+                    if(typeof dataBucket.dataset[0].point != "undefined" &&
+                        typeof dataBucket.dataset[0].point[0] != "undefined"){
                         bucketParsed.value = dataBucket.dataset[0].point[0].value[0].intVal; 
                     }
                     else{
@@ -105,6 +107,10 @@ function getAggregatedData(dataTypeName, startDate, endDate, bucketMillis) {
             defer.resolve( retVal );
         },
         error: function () {
+            if(arguments && arguments[0] && arguments[0].responseText){
+                console.log(arguments[0].responseText);
+                console.log(this.data);
+            }
             defer.reject();
         },
         async: true
